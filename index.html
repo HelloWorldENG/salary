@@ -72,6 +72,7 @@
         }
 
         #result {
+            display: none;
             margin-top: 20px;
             padding: 20px;
             background-color: #fff;
@@ -191,6 +192,9 @@
       let calculationInterval;
 
       function startCalculation() {
+
+        document.getElementById('result').style.display = 'block';
+        
         // 清除之前的计算间隔（如果存在）
         if (calculationInterval) {
           clearInterval(calculationInterval);
