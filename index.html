@@ -194,7 +194,7 @@
       function startCalculation() {
 
         document.getElementById('result').style.display = 'block';
-        
+
         // 清除之前的计算间隔（如果存在）
         if (calculationInterval) {
           clearInterval(calculationInterval);
@@ -226,7 +226,8 @@
           start: new Date(now.toDateString() + ' ' + lunchStart),
           end: new Date(now.toDateString() + ' ' + lunchEnd)
         };
-        const end = new Date(start.getTime() + hoursPerDay * 3600000); // 计算下班时间
+        const lunchDuration = (lunch.end - lunch.start) / 3600000; // 午休时长（小时）
+        const end = new Date(start.getTime() + (hoursPerDay + lunchDuration) * 3600000);
 
         if (now > end) {
           clearInterval(calculationInterval);
