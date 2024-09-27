@@ -194,11 +194,11 @@
             resultDiv.innerHTML = `
                 <div class="time">
                     <span class="label">当前已上班：</span>
-                    <span class="value">${secondsWorked} 秒 (${hoursWorked.toFixed(2)} 小时)</span>
+                    <span class="value">${hoursWorked.toFixed(4)} 小时 (${secondsWorked} 秒)</span>
                 </div>
                 <div class="money">
                     <span class="label">已赚：</span>
-                    <span class="value">${earned.toFixed(2)} 元</span>
+                    <span class="value">${earned.toFixed(4)} 元</span>
                 </div>
                 ${isLunchTime ? '<div class="lunch-time">现在是午休时间，不计算收入</div>' : ''}
             `;
