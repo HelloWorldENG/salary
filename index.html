@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>工作时间和收入计算器</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+          background-color: #f0f0f0;
+        }
+
+        h1 {
+          color: #333;
+          text-align: center;
+        }
+
+        .input-container {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+    }
+
+    .input-group {
+        width: 48%; /* 略小于50%以确保有一些间距 */
+    }
+
+    .input-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: #666;
+    }
+
+    .input-group input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+        font-size: 16px;
+    }
+
+    /* 对于小屏幕设备，恢复为单列布局 */
+    @media (max-width: 600px) {
+        .input-container {
+            flex-direction: column;
+        }
+
+        .input-group {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+    }
+
+        button {
+          width: 100%;
+          padding: 10px;
+          background-color: #4CAF50;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 16px;
+          transition: background-color 0.3s;
+        }
+
+        button:hover {
+          background-color: #45a049;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            font-size: 18px;
+            line-height: 1.6;
+        }
+        #result .time, #result .money {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        #result .label {
+            font-weight: bold;
+            color: #333;
+        }
+        #result .value {
+            color: #4CAF50;
+        }
+        #result .lunch-time {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #FFF9C4;
+            border-radius: 4px;
+            font-style: italic;
+            color: #FFA000;
+        }
+      </style>
+  </head>
+  <body>
+    <h1>工作时间和收入计算器</h1>
+    <div class="input-container">
+      <div class="input-group">
+          <label for="salary">月薪</label>
+          <input type="number" id="salary" placeholder="请输入月薪">
+      </div>
+      <div class="input-group">
+          <label for="workDays">一个月工作天数</label>
+          <input type="number" id="workDays" placeholder="请输入工作天数">
+      </div>
+  </div>
+  <div class="input-container">
+      <div class="input-group">
+          <label for="hoursPerDay">一天工作小时数</label>
+          <input type="number" id="hoursPerDay" placeholder="请输入每天工作小时数">
+      </div>
+      <div class="input-group">
+          <label for="startTime">上班时间</label>
+          <input type="time" id="startTime">
+      </div>
+  </div>
+  <div class="input-container">
+      <div class="input-group">
+          <label for="lunchStart">午休开始时间</label>
+          <input type="time" id="lunchStart">
+      </div>
+      <div class="input-group">
+          <label for="lunchEnd">午休结束时间</label>
+          <input type="time" id="lunchEnd">
+      </div>
+  </div>
+    <button onclick="startCalculation()">开始计算</button>
+    <div id="result"></div>
+
+    <script>
+      let calculationInterval;
+
+      function startCalculation() {
+        // 清除之前的计算间隔（如果存在）
+        if (calculationInterval) {
+          clearInterval(calculationInterval);
+        }
+
+        // 立即执行一次计算
+        calculate();
+
+        // 设置每秒更新一次
+        calculationInterval = setInterval(calculate, 1000);
+      }
+
+      function calculate() {
+        const salary = parseFloat(document.getElementById('salary').value);
+        const workDays = parseFloat(document.getElementById('workDays').value);
+        const hoursPerDay = parseFloat(document.getElementById('hoursPerDay').value);
+        const startTime = document.getElementById('startTime').value;
+        const lunchStart = document.getElementById('lunchStart').value;
+        const lunchEnd = document.getElementById('lunchEnd').value;
+
+        if (!salary || !workDays || !hoursPerDay || !startTime || !lunchStart || !lunchEnd) {
+          document.getElementById('result').innerHTML = '请填写所有信息！';
+          return;
+        }
+
+        const now = new Date();
+        const start = new Date(now.toDateString() + ' ' + startTime);
+        const lunch = {
+          start: new Date(now.toDateString() + ' ' + lunchStart),
+          end: new Date(now.toDateString() + ' ' + lunchEnd)
+        };
+
+        let secondsWorked = Math.floor((now - start) / 1000);
+        let isLunchTime = false;
+
+        // 如果当前时间在午休时间内
+        if (now >= lunch.start && now <= lunch.end) {
+          secondsWorked -= Math.floor((now - lunch.start) / 1000);
+          isLunchTime = true;
+        }
+        // 如果当前时间在午休时间之后
+        else if (now > lunch.end) {
+          secondsWorked -= Math.floor((lunch.end - lunch.start) / 1000);
+        }
+
+        const hoursWorked = secondsWorked / 3600;
+        const hourlyRate = salary / (workDays * hoursPerDay);
+        const earned = hourlyRate * hoursWorked;
+
+        const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <div class="time">
+                    <span class="label">当前已上班：</span>
+                    <span class="value">${secondsWorked} 秒 (${hoursWorked.toFixed(2)} 小时)</span>
+                </div>
+                <div class="money">
+                    <span class="label">已赚：</span>
+                    <span class="value">${earned.toFixed(2)} 元</span>
+                </div>
+                ${isLunchTime ? '<div class="lunch-time">现在是午休时间，不计算收入</div>' : ''}
+            `;
+        
+      }
+    </script>
+  </body>
+</html>
